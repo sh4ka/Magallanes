@@ -42,6 +42,18 @@ class Console
     private static $logFile = null;
 
     /**
+     * Whether or not use symlinks to the last log file
+     * @var boolean
+     */
+    private static $symlinkLog = true;
+
+    /**
+     * Filename for the log symlink
+     * @var boolean
+     */
+    private static $symlinkLogFilename = 'mage';
+
+    /**
      * Enables or Disables Logging
      * @var boolean
      */
@@ -240,6 +252,15 @@ class Console
 
             if (self::$verboseLogEnabled) {
                 echo $message . PHP_EOL;
+            }
+
+            if (self::$symlinkLog) {
+                if(file_exists(realpath(getcwd() . '/.mage/logs') . '/'.self::$symlinkLogFilename.'.log')){
+                    unlink(realpath(getcwd() . '/.mage/logs') . '/'.self::$symlinkLogFilename.'.log');
+                }
+                if(symlink(self::$logFile, realpath(getcwd() . '/.mage/logs') . '/'.self::$symlinkLogFilename.'.log') === false){
+                    throw new Exception('Error creating symlink for log file: '.self::$logFile.PHP_EOL);
+                }
             }
         }
     }
